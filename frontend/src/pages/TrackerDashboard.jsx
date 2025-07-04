@@ -19,6 +19,12 @@ function TrackerDashboard() {
   const vantaRef = useRef(null);
   const vantaEffect = useRef(null);
 
+  const pieData = [
+  { name: "Easy", value: data?.leetcode.easy || 0, fill: "#00e676" },
+  { name: "Medium", value: data?.leetcode.medium || 0, fill: "#ff9100" },
+  { name: "Hard", value: data?.leetcode.hard || 0, fill: "#f44336" },
+ ].filter(item => item.value > 0);
+
 
   useEffect(() => {
     const date = new Date();
@@ -175,62 +181,42 @@ function TrackerDashboard() {
               </div>
             </div>
             {/* Pie Chart */}
-            <div className="w-56 h-56 mr-25 relative transition-transform duration-300 hover:scale-105">
+            <div className="w-56 h-56 mr-25 transition-transform duration-300 hover:scale-105">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  {/* Easy Ring (Outer) */}
                   <Pie
-                    data={[
-                      { name: "Easy", value: data?.leetcode?.easy || 0 , fill:"#00e676"},
-                      { name: "Remaining", value: 883 - (data?.leetcode?.easy || 0), fill:"#1e1e1e" },
-                    ]}
+                    data={pieData}
                     dataKey="value"
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={58}
+                    innerRadius={48}
                     outerRadius={65}
-                    startAngle={90}
-                    endAngle={-270}
+                    paddingAngle={5}
+                    cornerRadius={5}
                     stroke="none"
-                    cornerRadius={10}
+                    labelLine={true}
+                    label={({ cx, cy, midAngle, outerRadius, value, fill }) => {
+                      const RADIAN = Math.PI / 180;
+                      const offset = 30;
+                      const x = cx + (outerRadius + offset) * Math.cos(-midAngle * RADIAN);
+                      const y = cy + (outerRadius + offset) * Math.sin(-midAngle * RADIAN);
 
+                      return (
+                        <text
+                          x={x}
+                          y={y}
+                          fill={fill}
+                          fontSize={14}
+                          fontWeight="bold"
+                          textAnchor="middle"
+                          dominantBaseline="central"
+                        >
+                          {value}
+                        </text>
+                      );
+                    }}
                   >
-                  </Pie>
-
-                  {/* Medium Ring (Middle) */}
-                  <Pie
-                    data={[
-                      { name: "Medium", value: data?.leetcode?.medium || 0 , fill:"#ff9100"},
-                      { name: "Remaining", value: 1872 - (data?.leetcode?.medium || 0), fill:"#1e1e1e" },
-                    ]}
-                    dataKey="value"
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={46}
-                    outerRadius={53}
-                    startAngle={90}
-                    endAngle={-270}
-                    stroke="none"
-                    cornerRadius={10}
-                  >
-                  </Pie>
-
-                  {/* Hard Ring (Inner) */}
-                  <Pie
-                    data={[
-                      { name: "Hard", value: data?.leetcode?.hard || 0, fill:"#f44336" },
-                      { name: "Remaining", value: 846 - (data?.leetcode?.hard || 0), fill:"#1e1e1e" },
-                    ]}
-                    dataKey="value"
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={34}
-                    outerRadius={41}
-                    startAngle={90}
-                    endAngle={-270}
-                    stroke="none"
-                    cornerRadius={10}
-                  >
+                    {pieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
